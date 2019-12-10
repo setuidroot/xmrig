@@ -27,6 +27,7 @@
 
 #include "crypto/rx/Rx.h"
 #include "backend/common/Tags.h"
+#include "backend/cpu/CpuConfig.h"
 #include "base/io/log/Log.h"
 #include "crypto/rx/RxConfig.h"
 #include "crypto/rx/RxQueue.h"
@@ -60,7 +61,7 @@ const char *xmrig::rx_tag()
 }
 
 
-bool xmrig::Rx::init(const Job &job, const RxConfig &config, bool hugePages)
+bool xmrig::Rx::init(const Job &job, const RxConfig &config, const CpuConfig &cpu)
 {
     if (job.algorithm().family() != Algorithm::RANDOM_X) {
         return true;
@@ -70,7 +71,7 @@ bool xmrig::Rx::init(const Job &job, const RxConfig &config, bool hugePages)
         return true;
     }
 
-    d_ptr->queue.enqueue(job, config.nodeset(), config.threads(), hugePages, config.mode());
+    d_ptr->queue.enqueue(job, config.nodeset(), config.threads(cpu.limit()), cpu.isHugePages(), config.isOneGbPages(), config.mode(), cpu.priority());
 
     return false;
 }
@@ -82,15 +83,15 @@ bool xmrig::Rx::isReady(const Job &job)
 }
 
 
-xmrig::RxDataset *xmrig::Rx::dataset(const Job &job, uint32_t nodeId)
+xmrig::HugePagesInfo xmrig::Rx::hugePages()
 {
-    return d_ptr->queue.dataset(job, nodeId);
+    return d_ptr->queue.hugePages();
 }
 
 
-std::pair<uint32_t, uint32_t> xmrig::Rx::hugePages()
+xmrig::RxDataset *xmrig::Rx::dataset(const Job &job, uint32_t nodeId)
 {
-    return d_ptr->queue.hugePages();
+    return d_ptr->queue.dataset(job, nodeId);
 }
 
 

@@ -19,6 +19,7 @@
     "randomx": {
         "init": -1,
         "mode": "auto",
+        "1gb-pages": false,
         "numa": true
     },
     "cpu": {
