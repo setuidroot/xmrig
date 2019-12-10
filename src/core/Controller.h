@@ -5,7 +5,8 @@
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
  * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
- * Copyright 2016-2018 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
+ * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
+ * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
  *   This program is free software: you can redistribute it and/or modify
  *   it under the terms of the GNU General Public License as published by
@@ -25,41 +26,41 @@
 #define XMRIG_CONTROLLER_H
 
 
-#include "common/interfaces/IWatcherListener.h"
-
-
-class Network;
-class StatsData;
+#include "base/kernel/Base.h"
+#include "base/tools/Object.h"
 
 
 namespace xmrig {
 
 
-class Config;
-class ControllerPrivate;
-class IControllerListener;
+class Job;
+class Miner;
+class Network;
 
 
-class Controller : public IWatcherListener
+class Controller : public Base
 {
 public:
-    Controller();
-    ~Controller();
+    XMRIG_DISABLE_COPY_MOVE_DEFAULT(Controller)
 
-    bool isDone() const;
-    bool isReady() const;
-    Config *config() const;
-    int init(int argc, char **argv);
+    Controller(Process *process);
+    ~Controller() override;
+
+    int init() override;
+    void pre_start();
+    void start() override;
+    void stop() override;
+
+    Miner *miner() const;
     Network *network() const;
-    void addListener(IControllerListener *listener);
-
-protected:
-    void onNewConfig(IConfig *config) override;
 
 private:
-    ControllerPrivate *d_ptr;
+    Miner *m_miner     = nullptr;
+    Network *m_network = nullptr;
 };
 
-} /* namespace xmrig */
+
+} // namespace xmrig
+
 
 #endif /* XMRIG_CONTROLLER_H */
