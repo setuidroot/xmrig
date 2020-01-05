@@ -168,6 +168,16 @@ void xmrig::ConfigTransform::transform(rapidjson::Document &doc, int key, const 
 
     case IConfig::RandomX1GbPagesKey: /* --randomx-1gb-pages */
         return set(doc, kRandomX, "1gb-pages", true);
+
+    case IConfig::RandomXWrmsrKey: /* --randomx-wrmsr */
+        if (arg == nullptr) {
+            return set(doc, kRandomX, "wrmsr", true);
+        }
+
+        return set(doc, kRandomX, "wrmsr", static_cast<int64_t>(strtol(arg, nullptr, 10)));
+
+    case IConfig::RandomXRdmsrKey: /* --randomx-no-rdmsr */
+        return set(doc, kRandomX, "rdmsr", false);
 #   endif
 
 #   ifdef XMRIG_FEATURE_OPENCL

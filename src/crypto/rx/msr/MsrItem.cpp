@@ -4,7 +4,9 @@
  * Copyright 2014      Lucas Jones <https://github.com/lucasjones>
  * Copyright 2014-2016 Wolf9466    <https://github.com/OhGodAPet>
  * Copyright 2016      Jay D Dee   <jayddee246@gmail.com>
- * Copyright 2017-2018 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
+ * Copyright 2017-2019 XMR-Stak    <https://github.com/fireice-uk>, <https://github.com/psychocrypt>
+ * Copyright 2018      Lee Clagett <https://github.com/vtnerd>
+ * Copyright 2018-2019 tevador     <tevador@gmail.com>
  * Copyright 2018-2019 SChernykh   <https://github.com/SChernykh>
  * Copyright 2016-2019 XMRig       <https://github.com/xmrig>, <support@xmrig.com>
  *
@@ -23,46 +25,48 @@
  */
 
 
-#include "crypto/rx/RxConfig.h"
-#include "base/io/json/Json.h"
+#include "crypto/rx/msr/MsrItem.h"
 #include "rapidjson/document.h"
 
 
-namespace xmrig {
-
-static const char *kInit        = "init";
-static const char *kMode        = "mode";
-static const char *kOneGbPages  = "1gb-pages";
-
-}
+#include <cstdio>
 
 
-rapidjson::Value xmrig::RxConfig::toJSON(rapidjson::Document &doc) const
+xmrig::MsrItem::MsrItem(const rapidjson::Value &value)
 {
-    using namespace rapidjson;
-    auto &allocator = doc.GetAllocator();
-
-    Value obj(kObjectType);
-    obj.AddMember(StringRef(kInit),         m_threads, allocator);
-    obj.AddMember(StringRef(kMode),         StringRef(modeName()), allocator);
-    obj.AddMember(StringRef(kOneGbPages),   m_oneGbPages, allocator);
-
-    return obj;
-}
-
-
-bool xmrig::RxConfig::read(const rapidjson::Value &value)
-{
-    if (value.IsObject()) {
-        m_threads    = Json::getInt(value, kInit, m_threads);
-        m_mode       = readMode(Json::getValue(value, kMode));
-
-#       ifdef XMRIG_OS_LINUX
-        m_oneGbPages = Json::getBool(value, kOneGbPages, m_oneGbPages);
-#       endif
-
-        return true;
+    if (!value.IsString()) {
+        return;
     }
 
-    return false;
+    auto kv = String(value.GetString()).split(':');
+    if (kv.size() < 2) {
+        return;
+    }
+
+    m_reg   = strtoul(kv[0], nullptr, 0);
+    m_value = strtoull(kv[1], nullptr, 0);
+    m_mask  = (kv.size() > 2) ? strtoull(kv[2], nullptr, 0) : kNoMask;
+}
+
+
+rapidjson::Value xmrig::MsrItem::toJSON(rapidjson::Document &doc) const
+{
+    return toString().toJSON(doc);
+}
+
+
+xmrig::String xmrig::MsrItem::toString() const
+{
+    constexpr size_t size = 48;
+
+    auto buf = new char[size]();
+
+    if (m_mask != kNoMask) {
+        snprintf(buf, size, "0x%" PRIx32 ":0x%" PRIx64 ":0x%" PRIx64, m_reg, m_value, m_mask);
+    }
+    else {
+        snprintf(buf, size, "0x%" PRIx32 ":0x%" PRIx64, m_reg, m_value);
+    }
+
+    return buf;
 }

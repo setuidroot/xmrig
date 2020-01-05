@@ -1,8 +1,45 @@
+# v5.x.x
+- [#1469](https://github.com/xmrig/xmrig/issues/1469) Fixed build with gcc 4.8.
+- [#1473](https://github.com/xmrig/xmrig/pull/1473) Added RandomX auto-config for mobile Ryzen APUs.
+- [#1477](https://github.com/xmrig/xmrig/pull/1477) Fixed compilation with Clang.
+- Fixed unwanted resume after RandomX dataset change.
+
+# v5.5.0
+- [#179](https://github.com/xmrig/xmrig/issues/179) Added support for [environment variables](https://xmrig.com/docs/miner/environment-variables) in config file.
+- [#1445](https://github.com/xmrig/xmrig/pull/1445) Removed `rx/v` algorithm.
+- [#1453](https://github.com/xmrig/xmrig/issues/1453) Fixed crash on 32bit systems.
+- [#1459](https://github.com/xmrig/xmrig/issues/1459) Fixed crash on very low memory systems.
+- [#1465](https://github.com/xmrig/xmrig/pull/1465) Added fix for 1st-gen Ryzen crashes.
+- [#1466](https://github.com/xmrig/xmrig/pull/1466) Added `cn-pico/tlo` algorithm.
+- Added `--randomx-no-rdmsr` command line option.
+- Added console title for Windows with miner name and version.
+- On Windows `priority` option now also change base priority.
+
+# v5.4.0
+- [#1434](https://github.com/xmrig/xmrig/pull/1434) Added RandomSFX (`rx/sfx`) algorithm for Safex Cash.
+- [#1445](https://github.com/xmrig/xmrig/pull/1445) Added RandomV (`rx/v`) algorithm for *new* MoneroV.
+- [#1419](https://github.com/xmrig/xmrig/issues/1419) Added reverting MSR changes on miner exit, use `"rdmsr": false,` in `"randomx"` object to disable this feature.
+- [#1423](https://github.com/xmrig/xmrig/issues/1423) Fixed conflicts with exists WinRing0 driver service.
+- [#1425](https://github.com/xmrig/xmrig/issues/1425) Fixed crash on first generation Zen CPUs (MSR mod accidentally enable Opcache), additionally now you can disable Opcache and enable MSR mod via config `"wrmsr": ["0xc0011020:0x0", "0xc0011021:0x60", "0xc0011022:0x510000", "0xc001102b:0x1808cc16"],`.
+- Added advanced usage for `wrmsr` option, for example: `"wrmsr": ["0x1a4:0x6"],` (Intel) and `"wrmsr": ["0xc0011020:0x0", "0xc0011021:0x40:0xffffffffffffffdf", "0xc0011022:0x510000", "0xc001102b:0x1808cc16"],` (Ryzen).
+- Added new config option `"verbose"` and command line option `--verbose`.
+
+# v5.3.0
+- [#1414](https://github.com/xmrig/xmrig/pull/1414) Added native MSR support for Windows, by using signed **WinRing0 driver** (© 2007-2009 OpenLibSys.org).
+- Added new [MSR documentation](https://xmrig.com/docs/miner/randomx-optimization-guide/msr).
+- [#1418](https://github.com/xmrig/xmrig/pull/1418) Increased stratum send buffer size.
+
+# v5.2.1
+- [#1408](https://github.com/xmrig/xmrig/pull/1408) Added RandomX boost script for Linux (if you don't like run miner with root privileges).
+- Added support for [AMD Ryzen MSR registers](https://www.reddit.com/r/MoneroMining/comments/e962fu/9526_hs_on_ryzen_7_3700x_xmrig_520_1gb_pages_msr/) (Linux only).
+- Fixed command line option `--randomx-wrmsr` option without parameters.
+
 # v5.2.0
-- **[#1388](https://github.com/xmrig/xmrig/pull/1388) Added 1GB huge pages support for Linux.**
-  - Added new option `1gb-pages` in `randomx` object.
+- **[#1388](https://github.com/xmrig/xmrig/pull/1388) Added [1GB huge pages support](https://xmrig.com/docs/miner/hugepages#onegb-huge-pages) for Linux.**
+  - Added new option `1gb-pages` in `randomx` object with command line equivalent `--randomx-1gb-pages`.
   - Added automatic huge pages configuration on Linux if use the miner with root privileges.
-  - Added new [hugepages documentation](https://xmrig.com/docs/miner/hugepages) article.
+- **Added [automatic Intel prefetchers configuration](https://xmrig.com/docs/miner/randomx-optimization-guide#intel-specific-optimizations) on Linux.**
+   - Added new option `wrmsr` in `randomx` object with command line equivalent `--randomx-wrmsr=6`.
 - [#1396](https://github.com/xmrig/xmrig/pull/1396) [#1401](https://github.com/xmrig/xmrig/pull/1401) New performance optimizations for Ryzen CPUs. 
 - [#1385](https://github.com/xmrig/xmrig/issues/1385) Added `max-threads-hint` option support for RandomX dataset initialization threads.  
 - [#1386](https://github.com/xmrig/xmrig/issues/1386) Added `priority` option support for RandomX dataset initialization threads. 
